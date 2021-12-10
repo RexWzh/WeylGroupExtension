@@ -1,3 +1,15 @@
+r"""
+## 主要函数
+1. ExpOfNilpotentMat(mat, max_depth=36, base_ring=ZZ) # 返回幂零阵的指数矩阵
+2. Thetas(s,n) 返回生成元集合 \{\theta_i\}_{i=1}^n
+3. OrderMatrixOfGens(gens) 返回生成元的群阶矩阵
+4. GroupByOrderMathix(order_mat) 群阶矩阵作为泛性质，生成群
+5. GroupTreeOfMaxDepth(G,depth) 生成群树（BFS）
+6. UniversalPropertyOfGroup(G,max_depth=-1) 求群生成元的泛性质
+7. relations2elements(relations,gens) 生成元通过 gens 转为群的子集
+"""
+
+
 def ExpOfNilpotentMat(mat, max_depth=36, base_ring=ZZ):
     """
     1. 返回幂零矩阵的指数矩阵
@@ -9,6 +21,7 @@ def ExpOfNilpotentMat(mat, max_depth=36, base_ring=ZZ):
     exp_mat = matrix.identity(dim) # 单位矩阵
     new,i = mat,1
     while not new.is_zero(): # 运算直到 new 为零矩阵
+        assert i < max_depth,"矩阵的%d次幂非零，计算终止"%max_depth
         exp_mat += 1/factorial(i) * new
         i += 1
         new *= mat
@@ -27,6 +40,7 @@ def Thetas(s,n):
     fs = [L.f(i+1).adjoint_matrix() for i in range(n)]
     thetas = [exp(es[i])*exp(-fs[i])*exp(es[i]) for i in range(n)]
     return thetas
+
 
 def OrderMatrixOfGens(gens):
     """
@@ -78,3 +92,66 @@ def GroupTreeOfMaxDepth(G,depth=-1):
                     S.append(c)
                     tree[-1].append(c)
     return tree
+
+
+def UniversalPropertyOfGroup(G,max_depth=-1):
+    """
+    1. 求群生成元的泛性质
+    2. G 的生成元不能存在相等，或者等于1
+    3. max_depth 获取层数，默认遍历整树
+    """
+    if max_depth == 0:
+        return [[G.one()]],[[""]],{}
+    # 检验输入
+    gens = list(G.gens()) # 生成元
+    S = [G.one()] + gens # 已生成群元素
+    assert len(S)==len(set(S)),"G 的生成元不能存在相等，或者等于1"
+    
+    # 群树：元素形式和字符串形式
+    tree = [[G.one()],gens] 
+    tree_str = [[""],["%d"%i for i in range(len(gens))]]
+    # 生成关系
+    relations = {}
+    while max_depth-1:
+        max_depth -= 1
+        new_layer = []
+        new_layer_str = []
+        for s,a in zip(tree_str[-1],tree[-1]):
+            for si,b in enumerate(gens):
+                c = a * b
+                c_str = s + "-%d"%si
+                if c in new_layer: # 化简到同一层
+                    if not any(s in c_str for s in relations):
+                        relations[c_str] = new_layer_str[new_layer.index(c)]
+                    continue
+                for i,layer in enumerate(tree):
+                    if c in layer: # 化简到前边层
+                        if not any(s in c_str for s in relations):
+                            relations[c_str] = tree_str[i][layer.index(c)]
+                        break
+                else:
+                    new_layer.append(c)
+                    new_layer_str.append(c_str)
+        if len(new_layer):
+            tree.append(new_layer)
+            tree_str.append(new_layer_str)
+        else:
+            break
+    return tree,tree_str,relations
+
+
+def relations2elements(relations,gens):
+    """将生成元转为群元素"""
+    one = gens[0]/gens[0]
+    elements = []
+    for key in relations:
+        new = one
+        for i in key.split("-"):
+            new *= gens[int(i)]
+        if not relations[key]: # 指向单位元
+            elements.append(new)
+            continue
+        for i in relations[key][::-1].split("-"):
+            new /= gens[int(i)]
+        elements.append(new)
+    return elements
