@@ -141,15 +141,13 @@ def UniversalPropertyOfGroup(G,max_depth=-1):
     relations = [(a,b) for a,b in zip(*relations)]
     return tree,tree_str,relations
 
-
-def relations2elements(relations,gens):
+def relation2element(relation,gens):
     """将生成元转为群元素"""
     one = gens[0]/gens[0]
-    def str2element(s):
-        if not s:return one
-        new = one
-        for i in s.split("-"):
-            new *= gens[int(i)]
-        return new
-    elements = [str2element(a)/str2element(b) for a,b in relations]
-    return elements
+    if not relation:return one
+    new = one
+    for i in relation.split("-"):
+        new *= gens[int(i)]
+    return new
+
+relations2elements = lambda relations,gens: [relation2element(a,gens)/relation2element(b,gens) for a,b in relations]
