@@ -46,7 +46,8 @@ def OrderMatrixOfGens(gens):
     1. 计算 gens 的群阶矩阵
     2. gens 的基环必须为整数环（或支持 .multiplicative_order 方法）
     """
-    orders = [[(a*b).multiplicative_order() for a in gens] for b in gens]
+    # 自带函数的 bug，单位元无法判断阶数
+    orders =[[1 if (a*b).is_one() else (a*b).multiplicative_order() for a in gens] for b in gens]
     return matrix(ZZ,orders)
 
 def GroupByOrderMatrix(order_mat):
