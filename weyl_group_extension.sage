@@ -10,18 +10,17 @@ r"""
 """
 
 
-def ExpOfNilpotentMat(mat, max_depth=36, base_ring=ZZ):
+def ExpOfNilpotentMat(mat, base_ring=ZZ):
     """
     1. 返回幂零矩阵的指数矩阵
-    2. max_depth 指定 x^n=0 中，n 的最大值
-    3. 默认基环为整数环
-    4. 输入必须为 Sage 矩阵类型
+    2. 默认基环为整数环
+    3. 输入必须为 Sage 矩阵类型
     """
     dim = mat.dimensions()[0]
     exp_mat = matrix.identity(dim) # 单位矩阵
     new,i = mat,1
-    while not new.is_zero(): # 运算直到 new 为零矩阵
-        assert i < max_depth,"矩阵的%d次幂非零，计算终止"%max_depth
+    while not new.is_zero(): # 此时 $mat^i \neq 0$
+        assert i < dim,"输入的矩阵非幂零！"
         exp_mat += 1/factorial(i) * new
         i += 1
         new *= mat
@@ -101,7 +100,7 @@ def UniversalPropertyOfGroup(G,max_depth=-1):
     3. max_depth 获取层数，默认遍历整树
     """
     if max_depth == 0:
-        return [[G.one()]],[[""]],{}
+        return [[G.one()]],[[""]],[]
     # 检验输入
     gens = list(G.gens()) # 生成元
     S = [G.one()] + gens # 已生成群元素
@@ -111,7 +110,7 @@ def UniversalPropertyOfGroup(G,max_depth=-1):
     tree = [[G.one()],gens] 
     tree_str = [[""],["%d"%i for i in range(len(gens))]]
     # 生成关系
-    relations = {}
+    relations = [[],[]]
     while max_depth-1:
         max_depth -= 1
         new_layer = []
@@ -121,13 +120,15 @@ def UniversalPropertyOfGroup(G,max_depth=-1):
                 c = a * b
                 c_str = s + "-%d"%si
                 if c in new_layer: # 化简到同一层
-                    if not any(s in c_str for s in relations):
-                        relations[c_str] = new_layer_str[new_layer.index(c)]
+                    if not any(s in c_str for s in relations[0]):
+                        relations[0].append(c_str)
+                        relations[1].append(new_layer_str[new_layer.index(c)])
                     continue
                 for i,layer in enumerate(tree):
                     if c in layer: # 化简到前边层
-                        if not any(s in c_str for s in relations):
-                            relations[c_str] = tree_str[i][layer.index(c)]
+                        if not any(s in c_str for s in relations[0]):
+                            relations[0].append(c_str)
+                            relations[1].append(tree_str[i][layer.index(c)])
                         break
                 else:
                     new_layer.append(c)
@@ -137,21 +138,18 @@ def UniversalPropertyOfGroup(G,max_depth=-1):
             tree_str.append(new_layer_str)
         else:
             break
+    relations = [(a,b) for a,b in zip(*relations)]
     return tree,tree_str,relations
 
 
 def relations2elements(relations,gens):
     """将生成元转为群元素"""
     one = gens[0]/gens[0]
-    elements = []
-    for key in relations:
+    def str2element(s):
+        if not s:return one
         new = one
-        for i in key.split("-"):
+        for i in s.split("-"):
             new *= gens[int(i)]
-        if not relations[key]: # 指向单位元
-            elements.append(new)
-            continue
-        for i in relations[key][::-1].split("-"):
-            new /= gens[int(i)]
-        elements.append(new)
+        return new
+    elements = [str2element(a)/str2element(b) for a,b in relations]
     return elements
