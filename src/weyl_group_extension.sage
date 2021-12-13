@@ -63,23 +63,18 @@ def GroupTreeOfMaxDepth(G,depth=-1):
     """
     1. BFS 获取群元素，按长度分层
     2. 获取前 depth 层，首层记0，默认获取整树（有限群）
-    3. 允许生成元重复
+    3. 如果层数不足 depth，最后一层用空列表标记
     """
     # 群树，初始为零层
     tree = [[G.one()]] 
     if depth == 0: # 只有零层
         return tree
-    gens = G.gens() # 生成元
-    S = [G.one()] # 已生成的群元素
-    tree.append([]) # 添加一层
-    # 将 gens 化简（去重复元素，以及单位元）
-    for a in gens:
-        if a not in S:
-            S.append(a)
-            tree[-1].append(a)
+    gens = list(G.gens()) # 生成元
+    S = [G.one()] + gens # 已生成的群元素
+    assert len(S)==len(set(S)),"G 的生成元不能存在相等，或者等于1"
+    tree.append(gens)
     if depth == 1: # 只有一层
         return tree
-    gens = tree[-1] # 简化的生成元
     
     # 循环开始，直到深度足够，或者群生成完毕
     while depth-1 and len(tree[-1]):
@@ -92,7 +87,6 @@ def GroupTreeOfMaxDepth(G,depth=-1):
                     S.append(c)
                     tree[-1].append(c)
     return tree
-
 
 def UniversalPropertyOfGroup(G,max_depth=-1):
     """
