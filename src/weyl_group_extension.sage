@@ -73,8 +73,6 @@ def GroupTreeOfMaxDepth(G,depth=-1):
     S = [G.one()] + gens # 已生成的群元素
     assert len(S)==len(set(S)),"G 的生成元不能存在相等，或者等于1"
     tree.append(gens)
-    if depth == 1: # 只有一层
-        return tree
     
     # 循环开始，直到深度足够，或者群生成完毕
     while depth-1 and len(tree[-1]):
