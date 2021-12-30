@@ -1,10 +1,17 @@
+################ initialize #################
+load("../src/weyl_group_extension.sage")
+
+## lie algebras of simple type
+LieDatas = [["A",range(1,9)],["B",range(2,9)],["C",range(3,9)],["D",range(4,9)],
+            ["E",range(6,9)],["F",[4]],["G",[2]]]
+
 ################ test tools #################
 from pprint import pprint
 class Time():
     import time
     def tic(self):
         self.time = time.time()
-    def toc(self,text='用时：'):
+    def toc(self,text='time cost:'):
         t = self.time
         self.tic()
         print(text+'%.3f'%(self.time-t))
@@ -14,7 +21,7 @@ toc = tt.toc
 
 # 保存数据
 def save_vari(v,name):
-    '''文件存储'''
+    '''save variables'''
     import pickle
     fout = open(name,'wb')
     pickle.dump(v,fout)
@@ -23,7 +30,7 @@ def save_vari(v,name):
 
 # 读取数据
 def read_vari(name):
-    '''读取文件'''
+    '''read variables'''
     import pickle
     fin = open(name,'rb')
     a = pickle.load(fin)
@@ -32,54 +39,60 @@ def read_vari(name):
 
 ###########################################
 
-### 检验泛性质 ###
-s,k = "A",4
-for n in range(1,6):
-    print(s,n)
-    gens = Thetas(s,n)
-    G = MatrixGroup(gens)
-    # 计算结果
-    tic()
-    _,_,relations = UniversalPropertyOfGroup(G,k)
-    toc()
-    # 定义商群
-    FG = FreeGroup(n)
-    elements = relations2elements(relations,FG.gens())
-    newG = FG/elements
-    tic()
-    len_newG = len(newG)
-    print(len(G)==len_newG)
-    toc()
+### Group structure ###
+# e.g. Type A
+res = [['level','|G|','|W|','|K|','Structure of G','Structure of W','Structure of W']] 
+s = "A" # lie algebra of Type A
+for n in range(1,8):
+    print(n,end="\t")
+    thetas = [gap(mat) for mat in Thetas(s,n,reduced=True)]
+    G = gap.Group(thetas)
+    K = gap.Group([x^2 for x in thetas])
+    W = WeylGroup([s,n])
+    res.append([n, gap.Size(G), W.order(), gap.Size(K),
+                gap.StructureDescription(G), W.structure_description(), gap.StructureDescription(K)])
+table(res) # pprint(res)
+
+
+### Chevalley basis ###
+def check(s,n):
+    "are all coefficients lie in 1,-1,0"
+    pos_num = (len(L.basis())-n)/2
+    thetas = Thetas(s,n,reduced=True)
+    for mat in thetas:
+        if max(max(mat)) > 1 or min(min(mat)) < -1:
+            return False
+    return True
+
+for s,l in LieDatas:
+    print(s,end="\t")
+    for n in l:
+        print(n,end="\t")
+        assert check(s,n),"Error guessing!"
+    print()
+
     
+### universal property ###
+s,n = "A",3
+G = WeylGroup([s,n])
+relations = UniversalPropertyOfGroup(G)
+table([rel for rel in relations if len(rel[0])<2*4])
 
-### 泛性质实验 ###
-# 初始化
-s,n,k = "A",5,4
-print(s,n)
-gens = Thetas(s,n)
-G = MatrixGroup(gens)
-# 计时
-tic()
-tree = GroupTreeOfMaxDepth(G,k)
-toc("获取群树用时")
-record_len = [len(i) for i in tree] # 记录各层长度数据
-print("各层数目",record_len)
 
-# 测试
-FG = FreeGroup(n)
-gens = FG.gens()
-# type_1 = [(gens[i]^4,FG.one()) for i in range(n)]
-type_2 = [(gens[i]*gens[i+1]*gens[i],gens[i+1]*gens[i]*gens[i+1]) for i in range(n-1)]
-type_3 = [(gens[i]*gens[j],gens[j]*gens[i]) for i in range(n) for j in range(n) if i-j>1]
-type_4 = [(gens[i]*gens[i+1]^2*gens[i],gens[i+1]^2) for i in range(n-1)]
-odd = FG.one()
-for i in range((n+1)//2):
-    odd *= gens[2*i]^2
-type_5 = [(odd,FG.one())] if n%2 else []
-elements = type_1 + type_2 + type_3 + type_4 + type_5
-QG = FG / [a/b for a,b in elements] # 商群
-tic()
-tree = GroupTreeOfMaxDepth(QG,k)
-toc()
-tree_len = [len(i) for i in tree]
-print("修改后的各层数目",tree_len,"\n是否相等",tree_len==record_len)
+### equalities by Coxeter relations ###
+# e.g. Type A
+# initialize
+s,n = "A",6
+print(DynkinDiagram([s,n]))
+M = matrix(CoxeterMatrix([s,n]))
+thetas = Thetas(s,n,reduced=True)
+thetas_square = [t^2 for t in thetas] # generators of K
+K = MatrixGroup(thetas_square)
+_,_,hash2str = GroupTree(K,s="t",check=False)
+# experiment
+res = []
+for i,t1 in enumerate(thetas):
+    res.append([])
+    for j,t2 in enumerate(thetas):
+        t = (t1*t2)^M[i,j]
+        res[-1].append(hash2str[myhash(t)])
