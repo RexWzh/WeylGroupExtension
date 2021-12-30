@@ -1,6 +1,7 @@
-import time
+################ test tools #################
 from pprint import pprint
 class Time():
+    import time
     def tic(self):
         self.time = time.time()
     def toc(self,text='用时：'):
@@ -29,6 +30,7 @@ def read_vari(name):
     fin.close()
     return a
 
+###########################################
 
 ### 检验泛性质 ###
 s,k = "A",4
