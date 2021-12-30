@@ -5,7 +5,7 @@ load("../src/weyl_group_extension.sage")
 LieDatas = [["A",range(1,9)],["B",range(2,9)],["C",range(3,9)],["D",range(4,9)],
             ["E",range(6,9)],["F",[4]],["G",[2]]]
 
-################ test tools #################
+################ debug/test tools #################
 from pprint import pprint
 class Time():
     import time
@@ -19,7 +19,6 @@ tt = Time()
 tic = tt.tic
 toc = tt.toc
 
-# 保存数据
 def save_vari(v,name):
     '''save variables'''
     import pickle
@@ -28,7 +27,6 @@ def save_vari(v,name):
     fout.close()
     return
 
-# 读取数据
 def read_vari(name):
     '''read variables'''
     import pickle

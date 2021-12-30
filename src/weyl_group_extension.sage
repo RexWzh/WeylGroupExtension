@@ -1,14 +1,3 @@
-r"""
-## 主要函数
-1. ExpOfNilpotentMat(mat, max_depth=36, base_ring=ZZ) # 返回幂零阵的指数矩阵
-2. Thetas(s,n) 返回生成元集合 \{\theta_i\}_{i=1}^n
-3. OrderMatrixOfGens(gens) 返回生成元的群阶矩阵
-4. GroupByOrderMathix(order_mat) 群阶矩阵作为泛性质，生成群
-5. GroupTreeOfMaxDepth(G,depth) 生成群树（BFS）
-6. UniversalPropertyOfGroup(G,max_depth=-1) 求群生成元的泛性质
-7. relations2elements(relations,gens) 生成元通过 gens 转为群的子集
-"""
-
 
 def NilExp(mat,base_ring=ZZ, max_order=None):
     """
