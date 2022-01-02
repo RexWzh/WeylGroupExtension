@@ -71,7 +71,7 @@ def UniversalPropertyOfGroup(G,depth=-1, s="s"):
     求群的生成元泛性质
     depth 设置层数，返回 depth-1 层关系
     """
-    tree,tree_str,hash2str = GroupTree(G,depth=depth,s="s")
+    tree,tree_str,hash2str = GroupTree(G,depth=depth,s=s)
     gens = list(G.gens())
     genstr = [s+str(i) for i in range(len(gens))]
     relations,depth = [],len(tree)
@@ -85,7 +85,7 @@ def UniversalPropertyOfGroup(G,depth=-1, s="s"):
     i,m = 0,len(relations)
     while i<m-1:
         rel = relations[i][0]
-        for j in range(m-1,i):
+        for j in range(m-1,i,-1):
             if rel in relations[j][0]:
                 del relations[j]
         i += 1
@@ -104,6 +104,16 @@ def UniversalPropertyOfGroup(G,depth=-1, s="s"):
 # relations2elements = lambda relations,gens: [relation2element(a,gens)/relation2element(b,gens) for a,b in relations]
 
 ## 其他函数
+
+def word2element(word,gens):
+    "word -> element"
+    ele = gens[0]/gens[0]
+    for i in list(word):
+        ele *= gens[int(i)]
+    return ele
+relations2element = lambda relations,gens:[(word2element(rel[0],gens),word2element(rel[1],gens)) for rel in relations]
+
+
 def OrderMatrixOfGens(gens):
     """
     1. 计算生成元的群阶矩阵

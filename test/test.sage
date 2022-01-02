@@ -39,8 +39,21 @@ def read_vari(name):
 
 ### Group structure ###
 # e.g. Type A
-res = [['level','|G|','|W|','|K|','Structure of G','Structure of W','Structure of W']] 
+# direct computation
+s = "A" 
+res = [["level","Structure of G","Size of G/W"]]
+for n in range(1,8):
+    print(n,end="\t")
+    thetas = [gap(mat) for mat in Thetas(s,n,reduced=True)] # generators
+    G = gap.Group(thetas)
+    W = WeylGroup([s,n])
+    res.append([n,gap.StructureDescription(G),gap.Size(G)/len(W)])
+table(res)
+
+# compare G,W and K
+res = [['level','|G|','|W|','|K|','Structure of G','Structure of W','Structure of K']] 
 s = "A" # lie algebra of Type A
+print(s)
 for n in range(1,8):
     print(n,end="\t")
     thetas = [gap(mat) for mat in Thetas(s,n,reduced=True)]
@@ -49,24 +62,25 @@ for n in range(1,8):
     W = WeylGroup([s,n])
     res.append([n, gap.Size(G), W.order(), gap.Size(K),
                 gap.StructureDescription(G), W.structure_description(), gap.StructureDescription(K)])
-table(res) # pprint(res)
-
+table(res)
 
 ### Chevalley basis ###
 def check(s,n):
-    "are all coefficients lie in 1,-1,0"
+    "检验系数是否恒为 1,-1,0"
+    L = LieAlgebra(ZZ,cartan_type=[s,n])
     pos_num = (len(L.basis())-n)/2
     thetas = Thetas(s,n,reduced=True)
-    for mat in thetas:
+    for mat in MatrixGroup(thetas):
+        mat = matrix(mat)
         if max(max(mat)) > 1 or min(min(mat)) < -1:
             return False
     return True
 
-for s,l in LieDatas:
-    print(s,end="\t")
+test_data = [["A",range(1,6)],["F",[4]],["G",[2]],["B",range(2,6)],["C",range(2,6)],["D",range(4,6)]]
+for s,l in test_data:
+    print(s)
     for n in l:
-        print(n,end="\t")
-        assert check(s,n),"Error guessing!"
+        print(check(s,n),end="\t")
     print()
 
     
@@ -94,3 +108,4 @@ for i,t1 in enumerate(thetas):
     for j,t2 in enumerate(thetas):
         t = (t1*t2)^M[i,j]
         res[-1].append(hash2str[myhash(t)])
+table(res)
