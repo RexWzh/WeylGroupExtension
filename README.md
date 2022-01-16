@@ -1,4 +1,4 @@
-# Weyl 群扩张群相关工具
+## Weyl 群扩张群相关工具
 SageMath 实战例子。
 
 内容如下：
@@ -7,7 +7,7 @@ SageMath 实战例子。
    - [$\widetilde{W}$的泛性质](#universal)
    - [总结及延伸](#summarize)
 
-注：SageMath 的环境未配置， CI/CD 一边学习再补上。
+> 注：SageMath 的环境未配置， CI/CD 一边学习再补上。
 
 ---
 
