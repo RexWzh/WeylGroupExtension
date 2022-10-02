@@ -3,11 +3,9 @@ SageMath 实战例子。
 
 内容如下：
    - [记号及问题](#notation)
-   - [$\widetilde{W}的结构$](#structure)
-   - [$\widetilde{W}$的泛性质](#universal)
+   - [W的结构](#structure)
+   - [W的泛性质](#universal)
    - [总结及延伸](#summarize)
-
-注：SageMath 的环境未配置， CI/CD 一边学习再补上。
 
 ---
 
@@ -26,7 +24,9 @@ SageMath 实战例子。
    $Der(L)$|导子代数 | -
    $e^\delta,\delta\in Der(L)$| 幂零导子诱导同构 | $e^\delta:=\sum\limits_{k=0}^\infty \frac{1}{k!}\delta^k$
    $Inn(L)$|内自同构群 | 由 $e^{adx}$ 生成，$x\in L$ 且 $adx$ 幂零
+   
    特别地，由于 $ade_i,adf_i$ 为幂零导子，定义
+   
    $$
       \theta_i=e^{ade_i}e^{-adf_i}e^{ade_i},\ 
       \widetilde{S}=\{\theta_i\}_{i=1}^n,\ 
@@ -34,15 +34,18 @@ SageMath 实战例子。
    $$
 
 2. 定义映射 $\varphi$：
+
    $$
    \begin{aligned}
       \varphi : \widetilde{W}&\rightarrow W\\
                \tilde{w}&\mapsto \left.\tilde{w}\right|_H
    \end{aligned}
    $$
+   
    由 [Carter prop.7.18](http://qiniu.wzhecnu.xyz/chapter-7-Lie%20algebras%20of%20finite%20and%20affine.pdf) 知，$\varphi$ 为满的群同态且 $\varphi(\theta_i)=s_i$
 
 3. 记 $\widetilde{K}=ker(\varphi)$，则
+
    $$
       \widetilde{W}/\widetilde{K}\cong W, \ 
       \widetilde{W}\cong\widetilde{K}\rtimes_\sigma W
@@ -57,13 +60,19 @@ SageMath 实战例子。
 
 ### 编程实验
 1. 易证下边性质，用于 $\theta_i$ 的计算
+
    $$(ade_i)^k=0\Leftrightarrow (adf_i)^k=0\Leftrightarrow k > \max_{j\neq i}\{-A_{ij},2\}$$
+   
    ABCDEF 族单李代数：
+   
    $$(ade_i)^3=0,\ e^{ade_i}=1+ade_i+\frac{1}{2}(ade_i)^2$$
+   
    G 族单李代数：
+   
    $$(ade_i)^4=0,\ e^{ade_i}=1+ade_i+\frac{1}{2}(ade_i)^2+\frac{1}{3!}(ade_i)^3$$
 
 2. 由 $\left.\theta_i^2\right|_H=\left.id\right|_H$ ，定义 $\widetilde{W}$ 的子群 $K$
+
    $$K =\langle\theta_i^2\vert i=1,\dots,n\rangle\subseteq\widetilde{K}$$
 
 3. 编程观察 $\widetilde{W},K,W$ 三者关系，以 A 型为例
@@ -100,6 +109,7 @@ SageMath 实战例子。
    1. $K=\widetilde{K}$
    2. $K\cong (C_2)^{k_n}$ 为交换 p-群
    3. A-G 族的一般规律为：
+   
    $$
    \begin{array}{|c|ccccccccc|}
    \hline
@@ -113,11 +123,14 @@ SageMath 实战例子。
 下边推导 $K$ 的结构，解释上表规律，相关计算参看之前的[录课](https://www.bilibili.com/video/BV1Yv411r715)，或者[手写草稿](http://qiniu.wzhecnu.xyz/weyl-extension-handwriting.pdf)。
 
 1. 记 $k=A_{ij}(i\neq j)$，易证
+
    $$
    adf_i^sade_i^re_j=\begin{pmatrix}r\\ s\end{pmatrix}\begin{pmatrix}k-r+s\\ s\end{pmatrix}s!ade_i^{r-s}e_j\\
    ade_i^sadf_i^rf_j=\begin{pmatrix}r\\ s\end{pmatrix}\begin{pmatrix}k-r+s\\ s\end{pmatrix}s!adf_i^{r-s}f_j
    $$
+   
    继而得到 $\theta_i$ 作用公式：
+   
    $$
    \begin{aligned}
       \theta_ie_j&=\begin{cases}
@@ -132,16 +145,20 @@ SageMath 实战例子。
    $$
 
 2. 推论1：记 $k=A_{ij}$，则
+
    $$
    \theta_i^2e_j=(-1)^ke_j\\
    \theta_i^2f_j=(-1)^kf_j
    $$
 
 3. 推论2：定义 $\tau\in Aut(L)$ 如下
+
    $$
    \tau(e_i)=-f_i,\tau(f_i)=-e_i,\tau(h_i)=-h_i
    $$
+   
    则
+   
    $$
    \tau\theta_i\tau=\tau\theta_i\tau^{-1}=\theta_i,\ \forall\ i
    $$
@@ -150,22 +167,28 @@ SageMath 实战例子。
 5. 特别地，由
    $(\theta_i^2e_1,\theta_i^2e_2,\cdots,\theta_i^2e_n)=((-1)^{-A_{i1}}e_1,(-1)^{-A_{i2}}e_2,\cdots,(-1)^{-A_{in}}e_n)$
    得到嵌入映射 $\psi$
+   
    $$
    \begin{aligned}
       \psi :K&\hookrightarrow (C_2)^n\\
       \theta_i^2&\mapsto row_i(A)
    \end{aligned}
    $$
+   
    且易见 $\psi$ 为群同态
+   
    $$
    \psi(\theta_i^2\cdot\theta_j^2)=\psi(\theta_i^2)+\psi(\theta_j^2)\\
    $$
+   
    $K$ 同构于 Cartan 矩阵的 $\mathbb{Z}_2$ 行空间的加法群，解释了上表规律
+   
    $$
    K\cong Im(\psi)\cong span_{\mathbb{Z}_2}\{row_i(A)|\  \forall\ i\}
    $$
 
 比如 $A_3$ 的 Cartan 矩阵秩为 2， $K\cong (C_2)^2$
+
 $$
 \left(\begin{array}{rrr}
    2 & -1 & 0 \\
@@ -185,6 +208,7 @@ $$
 和前边一样，我们通过编程实验，先“知道”结论，再推导证明。
 ### 编程实验
 1. 设群 $G=\langle X\rangle$，求 $G$ 关于生成元 $X$ 的泛性质。换言之，设 $F(X)$ 为集合 $X$ 上的自由群，求 $F(X)$ 子集 $R(X)$，使得
+
    $$
    F(X)/\overline{R(X)}\cong G
    $$
@@ -213,6 +237,7 @@ $$
    ![深度截图_选择区域_20220102115606](https://cdn.jsdelivr.net/gh/zhihongecnu/PicBed/picgo/深度截图_选择区域_20220102115606.png)
 
 4. 结合推导和实验，得出这几条性质：
+
    $$
    \begin{align*}
          (\theta_i\theta_j)^{o(s_is_j)}&=
@@ -240,26 +265,35 @@ $$
 ### 理论推导
    
 1. 先证明 $\widetilde{K}\subseteq K$，即证：
+
    $$
    \begin{align*}
    \left.\theta_{i_1}\cdots\theta_{i_k}\right|_H=\left.id\right|_H&\Rightarrow\theta_{i_1}\cdots\theta_{i_k}\in K\\
    i.e.\quad s_{i_1}\cdots s_{i_k}=1&\Rightarrow\theta_{i_1}\cdots\theta_{i_k}\in K
    \end{align*}
    $$
+   
    定义自由群 $F(S)$ 和 $F(\widetilde{S})$ 的子集如下：
+   
    $$
    X = \{(s_is_j)^{o(s_is_j)}|\ \forall\ i,j\}\subseteq F(S)\\
    \widetilde{X} = \{(\theta_i\theta_j)^{o(s_is_j)}|\ \forall\ i,j\}\subseteq F(\widetilde{S})
    $$
+   
    由 Coxeter 群泛性质，左侧表达式写为
+   
    $$
    s_{i_1}\cdots s_{i_k}=x_1^{y_1}\cdots x_r^{y_r},\ where\ x_i\in X,y_i\in W
    $$
+   
    相应地，右侧式子化为
+   
    $$
    \theta_{i_1}\cdots \theta_{i_k}=\tilde x_1^{\tilde y_1}\cdots \tilde{x}_r^{\tilde{y}_r},\ where\ \tilde x_i\in \widetilde X,\tilde y_i\in \widetilde W
    $$
+   
    进而：
+   
    $$
    \begin{aligned}
       equality\ (1)&\Rightarrow \tilde x_i\in K\\
@@ -270,6 +304,7 @@ $$
 
 2. 下证性质 (1)-(4) 构成 $\widetilde{W}$ 的泛性质：
    设 $\theta_{i_1}\cdots \theta_{i_k}=1$，则
+   
    $$
    \begin{aligned}
       As\ stated\ &before\\
@@ -284,14 +319,17 @@ $$
 
 3. 最后，借助泛性质给出 $\widetilde{W}=K\rtimes_\sigma W$ 中的 2-cocycle $\sigma$:
    - 定义陪集映射 $\gamma$
+   
       $$
       \begin{aligned}
          \gamma :W&\rightarrow \widetilde{W}\\
          w=s_{i_1}s_{i_2}\cdots s_{i_k}&\mapsto \theta_{i_1}\theta_{i_2}\cdots \theta_{i_k}
       \end{aligned}
       $$
+      
       其中 $s_{i_1}s_{i_2}\cdots s_{i_k}$ 为 $w$ 的简约表达，且按字典序取到极小。
    - 定义 $W$ 在 $K$ 上的作用：
+   
       $$
       \begin{aligned}
          W&\rightarrow Aut(K)\\
@@ -299,13 +337,16 @@ $$
          &\qquad\quad\ \ x\mapsto \gamma(w)x\gamma(w)^{-1}
       \end{aligned}
       $$
+      
    - 定义二上圈 $\sigma$
+   
       $$
       \begin{aligned}
          \sigma :W\times W&\rightarrow K\\
          (w_1,w_2)&\mapsto \gamma(w_1)\gamma(w_2)\gamma(w_1w_2)^{-1}
       \end{aligned}
       $$
+      
    由泛性质知 $\sigma$ 右侧取值在 $K$ 上，且式子可借助 (1)-(4) 化简。
 
 
@@ -313,6 +354,7 @@ $$
 ## <span id="summarize">总结延伸</span>
 ### 总结
 1. $\widetilde{W}\cong K\rtimes_\sigma W$， $K$ 和 $W$ 如下表
+
    $$
    \begin{array}{|c|ccccccccc|}
    \hline
@@ -325,6 +367,7 @@ $$
    一般地，$K\cong (C_2)^{k_n}$，$k_n$ 为 Cartan 矩阵 $Z_2$ 列空间的维数
 
 2. $\widetilde{W}$ 关于生成元 $\widetilde{S}$ 的泛性质为
+
    $$
    \begin{align*}
          (\theta_i\theta_j)^{o(s_is_j)}&=
